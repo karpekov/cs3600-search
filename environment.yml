@@ -1,0 +1,17 @@
+name: cs3600-search
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - numpy
+  - pandas
+  - matplotlib
+  - networkx
+  - ipywidgets
+  - jupyter
+  - notebook
+  - altair
+  - pip
+  - pip:
+    - ipython
