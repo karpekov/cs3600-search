@@ -438,6 +438,9 @@ def run_graph_search_example(graph, algo, start, goal, heuristic=None):
     return path, visited, metrics
 
 def create_graph_search_demo(demo_graph):
+    """
+    Create a demo of the graph search algorithms.
+    """
     import ipywidgets as widgets
     from IPython.display import display, clear_output
     import matplotlib.pyplot as plt
