@@ -4,9 +4,15 @@ import pandas as pd
 import numpy as np
 import altair as alt
 from collections import defaultdict
+import os
 
 from graph_search import create_demo_graph, create_large_demo_graph, graph_search, euclidean_distance_heuristic, manhattan_distance_heuristic
 from n_puzzle import create_specific_puzzle, n_puzzle_search
+# Add import for word ladder
+try:
+    from word_ladder import WordLadderGame, hamming_distance, letter_set_difference, vowel_consonant_difference
+except ImportError:
+    print("Word ladder module not found. Word ladder metrics will not be available.")
 
 def run_graph_search_simulations(num_simulations=50, algorithms=None, start_nodes=None, goal_nodes=None):
     """
@@ -370,3 +376,314 @@ def create_success_rate_chart(df, title=None):
     )
 
     return chart
+
+def run_word_ladder_simulations(num_simulations=30, algorithms=None, word_lengths=None, use_nltk=True):
+    """
+    Run multiple simulations of word ladder search algorithms and collect metrics.
+
+    Args:
+        num_simulations: Number of simulations to run per word length
+        algorithms: List of algorithms to run (default: all)
+        word_lengths: List of word lengths to test (default: [3, 4, 5])
+        use_nltk: Whether to use NLTK for word corpus
+
+    Returns:
+        DataFrame with simulation results
+    """
+    if 'WordLadderGame' not in globals():
+        print("Word ladder module not imported. Cannot run simulations.")
+        return pd.DataFrame()
+
+    if algorithms is None:
+        algorithms = ['bfs', 'dfs', 'ucs', 'greedy', 'astar']
+
+    if word_lengths is None:
+        word_lengths = [3, 4, 5]
+
+    # Prepare heuristic names and functions
+    heuristics = {
+        'hamming': hamming_distance,
+        'letter_set': letter_set_difference,
+        'vowel_consonant': vowel_consonant_difference
+    }
+
+    # Ensure word list files exist
+    WordLadderGame.generate_word_list_files()
+
+    # Run simulations and collect results
+    results = []
+
+    # Words for testing that are known to have paths
+    test_word_pairs = {
+        3: [('cat', 'dog'), ('hit', 'cog'), ('hot', 'dog'), ('bat', 'rat')],
+        4: [('play', 'work'), ('cold', 'warm'), ('word', 'talk'), ('make', 'take')],
+        5: [('light', 'night'), ('world', 'peace'), ('house', 'place'), ('sound', 'water')]
+    }
+
+    for word_length in word_lengths:
+        # Create a game with the specified word length
+        try:
+            game = WordLadderGame(word_length=word_length, use_nltk=use_nltk)
+            print(f"Created game with {len(game.words)} {word_length}-letter words")
+
+            if len(game.words) < 2:
+                print(f"Not enough {word_length}-letter words, skipping")
+                continue
+
+            # Get pairs to test
+            word_pairs = []
+
+            # First add any known test pairs that exist in our dictionary
+            for start, target in test_word_pairs.get(word_length, []):
+                if start in game.words and target in game.words:
+                    word_pairs.append((start, target))
+
+            # If we don't have enough pairs, add some random ones
+            words_list = list(game.words)
+            while len(word_pairs) < num_simulations:
+                # Select random start and target words
+                start = random.choice(words_list)
+                # Try to find a word that is a reasonable distance from start
+                candidates = [w for w in words_list if hamming_distance(start, w) > 1 and w != start]
+                if candidates:
+                    target = random.choice(candidates)
+                    word_pairs.append((start, target))
+                else:
+                    # Just pick any different word
+                    target = random.choice([w for w in words_list if w != start])
+                    word_pairs.append((start, target))
+
+            # Run the simulations
+            for i, (start, target) in enumerate(word_pairs):
+                print(f"Running simulation {i+1}/{len(word_pairs)} for {word_length}-letter words: {start} -> {target}")
+
+                for algorithm in algorithms:
+                    if algorithm in ['greedy', 'astar']:
+                        for h_name, h_func in heuristics.items():
+                            try:
+                                path, visited, metrics, _ = game.find_path(
+                                    start, target, algorithm=algorithm, heuristic=h_func
+                                )
+
+                                results.append({
+                                    'simulation': i,
+                                    'algorithm': f"{algorithm}_{h_name}",
+                                    'word_length': word_length,
+                                    'start_word': start,
+                                    'target_word': target,
+                                    'path_found': path is not None,
+                                    'path_length': len(path) - 1 if path else float('inf'),
+                                    'path_cost': metrics['path_cost'],
+                                    'nodes_visited': metrics['nodes_visited'],
+                                    'max_frontier_size': metrics['space'],
+                                    'time': metrics['time']
+                                })
+                            except Exception as e:
+                                print(f"Error in {algorithm}_{h_name} for {start}->{target}: {e}")
+                    else:
+                        try:
+                            path, visited, metrics, _ = game.find_path(
+                                start, target, algorithm=algorithm
+                            )
+
+                            results.append({
+                                'simulation': i,
+                                'algorithm': algorithm,
+                                'word_length': word_length,
+                                'start_word': start,
+                                'target_word': target,
+                                'path_found': path is not None,
+                                'path_length': len(path) - 1 if path else float('inf'),
+                                'path_cost': metrics['path_cost'],
+                                'nodes_visited': metrics['nodes_visited'],
+                                'max_frontier_size': metrics['space'],
+                                'time': metrics['time']
+                            })
+                        except Exception as e:
+                            print(f"Error in {algorithm} for {start}->{target}: {e}")
+        except Exception as e:
+            print(f"Error creating game for {word_length}-letter words: {e}")
+
+    return pd.DataFrame(results)
+
+def create_word_length_heatmap(df, value_col='time', title=None):
+    """
+    Create a heatmap to compare algorithm performance across different word lengths.
+
+    Args:
+        df: DataFrame with simulation results
+        value_col: Column to use for heatmap values
+        title: Chart title
+
+    Returns:
+        Altair chart
+    """
+    if title is None:
+        title = f"{value_col.replace('_', ' ').title()} vs Word Length by Algorithm"
+
+    # Calculate mean values for each algorithm and word length
+    summary = df.groupby(['algorithm', 'word_length'])[value_col].mean().reset_index()
+
+    # Create a heatmap
+    heatmap = alt.Chart(summary).mark_rect().encode(
+        x=alt.X('word_length:O', title='Word Length'),
+        y=alt.Y('algorithm:N', title='Algorithm', sort=None),
+        color=alt.Color(f'{value_col}:Q', title=value_col.replace('_', ' ').title(),
+                      scale=alt.Scale(scheme='viridis')),
+        tooltip=['algorithm', 'word_length', alt.Tooltip(f'{value_col}:Q', format='.2f')]
+    ).properties(
+        title=title,
+        width=500,
+        height=alt.Step(40)
+    )
+
+    return heatmap
+
+def compare_heuristics_chart(df, algorithm='astar', metric='nodes_visited', title=None):
+    """
+    Create a chart specifically comparing different heuristics for a given algorithm.
+
+    Args:
+        df: DataFrame with simulation results
+        algorithm: Algorithm to analyze (default: 'astar')
+        metric: Metric to compare (default: 'nodes_visited')
+        title: Chart title
+
+    Returns:
+        Altair chart
+    """
+    if title is None:
+        title = f"Heuristic Comparison for {algorithm.upper()}: {metric.replace('_', ' ').title()}"
+
+    # Filter for just the specified algorithm
+    filtered_df = df[df['algorithm'].str.startswith(f"{algorithm}_")].copy()
+
+    if len(filtered_df) == 0:
+        print(f"No data found for algorithm {algorithm} with heuristics")
+        return None
+
+    # Extract just the heuristic name
+    filtered_df['heuristic'] = filtered_df['algorithm'].str.replace(f"{algorithm}_", "", regex=False)
+
+    # Group by heuristic and word length (if present)
+    if 'word_length' in filtered_df.columns:
+        summary = filtered_df.groupby(['heuristic', 'word_length'])[metric].mean().reset_index()
+
+        # Create a grouped bar chart
+        chart = alt.Chart(summary).mark_bar().encode(
+            x=alt.X('heuristic:N', title='Heuristic'),
+            y=alt.Y(f'{metric}:Q', title=metric.replace('_', ' ').title()),
+            color='heuristic:N',
+            column='word_length:N'
+        ).properties(
+            title=title,
+            width=150,
+            height=300
+        )
+    else:
+        # For other types of problems without word_length
+        summary = filtered_df.groupby(['heuristic'])[metric].mean().reset_index()
+
+        # Create a simple bar chart
+        chart = alt.Chart(summary).mark_bar().encode(
+            x=alt.X('heuristic:N', title='Heuristic'),
+            y=alt.Y(f'{metric}:Q', title=metric.replace('_', ' ').title()),
+            color='heuristic:N'
+        ).properties(
+            title=title,
+            width=400,
+            height=300
+        )
+
+    return chart
+
+def create_word_ladder_success_rate_chart(df, title=None):
+    """
+    Create a chart showing the success rate of different algorithms by word length.
+
+    Args:
+        df: DataFrame with simulation results
+        title: Chart title
+
+    Returns:
+        Altair chart
+    """
+    if title is None:
+        title = "Success Rate by Algorithm and Word Length"
+
+    # Calculate success rate for each algorithm and word length
+    success_df = df.groupby(['algorithm', 'word_length'])['path_found'].mean().reset_index()
+    success_df['success_rate'] = success_df['path_found'] * 100
+
+    # Create a bar chart for success rate
+    chart = alt.Chart(success_df).mark_bar().encode(
+        x=alt.X('algorithm:N', title='Algorithm'),
+        y=alt.Y('success_rate:Q', title='Success Rate (%)'),
+        color='algorithm:N',
+        column='word_length:N',
+        tooltip=['algorithm', 'word_length', alt.Tooltip('success_rate:Q', format='.1f')]
+    ).properties(
+        title=title,
+        width=100,
+        height=300
+    )
+
+    return chart
+
+def analyze_word_ladder_performance(num_simulations=5, word_lengths=None, algorithms=None):
+    """
+    Run word ladder simulations and create a comprehensive analysis dashboard.
+
+    Args:
+        num_simulations: Number of simulations per word length
+        word_lengths: Word lengths to test
+        algorithms: Algorithms to test
+
+    Returns:
+        DataFrame with results and displays charts
+    """
+    from IPython.display import display
+
+    # Run the simulations
+    print("Running word ladder simulations...")
+    results_df = run_word_ladder_simulations(
+        num_simulations=num_simulations,
+        word_lengths=word_lengths,
+        algorithms=algorithms
+    )
+
+    if len(results_df) == 0:
+        print("No results to analyze.")
+        return results_df
+
+    print(f"Completed {len(results_df)} algorithm runs")
+
+    # Create and display various charts
+    metrics = ['time', 'nodes_visited', 'max_frontier_size', 'path_length']
+
+    print("\nGenerating performance charts...")
+    for metric in metrics:
+        chart = create_performance_charts(results_df, metric=metric)
+        display(chart)
+
+    print("\nGenerating heatmaps by word length...")
+    for metric in metrics:
+        heatmap = create_word_length_heatmap(results_df, value_col=metric)
+        display(heatmap)
+
+    print("\nGenerating boxplots...")
+    for metric in metrics:
+        boxplot = create_boxplot(results_df, value_col=metric)
+        display(boxplot)
+
+    print("\nGenerating success rate chart...")
+    success_chart = create_word_ladder_success_rate_chart(results_df)
+    display(success_chart)
+
+    print("\nComparing heuristics for informed search...")
+    for metric in metrics:
+        heuristic_chart = compare_heuristics_chart(results_df, algorithm='astar', metric=metric)
+        if heuristic_chart:
+            display(heuristic_chart)
+
+    return results_df

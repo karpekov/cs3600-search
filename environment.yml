@@ -12,6 +12,7 @@ dependencies:
   - jupyter
   - notebook
   - altair
+  - nltk
   - pip
   - pip:
     - ipython

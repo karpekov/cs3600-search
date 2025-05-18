@@ -50,3 +50,6 @@ Thumbs.db
 *.pid
 *.gz
 *.log
+
+# Project specific files
+word_lists/
