@@ -112,9 +112,11 @@ Debugging code is an excellent way to understand the algorithms and their implem
 3. Go to the Debug tab (or press `Ctrl+Shift+D` / `Cmd+Shift+D`)
 4. Create a `launch.json` file if it doesn't exist yet, with a Python configuration
 
-![VSCode Debug Setup](screenshots/vscode_debug_setup.png)
+Read more about setting up a debug environment in VSCode [here](https://code.visualstudio.com/docs/debugtest/debugging).
 
 ### Debugging graph_search.py
+
+![Setting Breakpoints](screenshots/graph_search_breakpoint.jpg)
 
 1. Open `graph_search.py` in your editor
 2. Scroll to the end of the file where the `if __name__ == "__main__":` section is
@@ -123,38 +125,10 @@ Debugging code is an excellent way to understand the algorithms and their implem
    - Line ~210: At the beginning of the function to observe initialization
    - Line ~270: Inside the main `while frontier:` loop to see each iteration
    - Line ~290: Where neighbors are processed and added to the frontier
-   - Line ~240: Where the goal is found and the path is returned
-
-![Setting Breakpoints](screenshots/setting_breakpoints.png)
-
+   - Line ~240: Where the goal is found and the path is returne
 5. Run the file in debug mode:
    - In VSCode: Press F5 or click the green play button in the Debug tab
    - This will execute the code in `if __name__ == "__main__":` section and hit your breakpoints
-
-### Debugging n_puzzle.py
-
-1. Open `n_puzzle.py` in your editor
-2. Go to the `if __name__ == "__main__":` section at the bottom
-3. This section already contains code that creates and solves an 8-puzzle
-4. Set breakpoints in the `n_puzzle_search` function:
-   - At the beginning of the function to observe initialization
-   - In the main search loop to observe state expansion
-   - Where goal states are checked
-   - Where new states are added to the frontier
-
-5. Run the file in debug mode to hit your breakpoints and observe the algorithm
-
-### Debugging word_ladder.py
-
-1. Open `word_ladder.py` in your editor
-2. Go to the `if __name__ == "__main__":` section at the bottom
-3. The section creates a WordLadderGame and finds a path from "cat" to "dog"
-4. Set breakpoints in these key locations:
-   - In the `_create_word_graph` method to understand graph construction
-   - In the `find_path` method which calls the general graph search function
-   - In the `_differs_by_one_letter` method to see how neighbors are determined
-
-5. Run the file in debug mode to hit your breakpoints
 
 ### Key Variables to Watch
 
@@ -179,8 +153,6 @@ When debugging these algorithms, pay attention to these important variables:
 - `words`: The set of valid words in the dictionary
 - `path`: The sequence of words from start to target
 
-![Watching Variables](screenshots/watching_variables.png)
-
 ### Understanding Algorithm Differences
 
 By setting breakpoints and watching the execution, you can understand the key differences between algorithms:
@@ -188,15 +160,11 @@ By setting breakpoints and watching the execution, you can understand the key di
 #### BFS vs DFS
 - In BFS (`algorithm='bfs'`): Watch how frontier acts as a queue (FIFO)
 - In DFS (`algorithm='dfs'`): Watch how frontier acts as a stack (LIFO)
-- Notice how BFS explores breadth-first (all neighbors before moving deeper)
-- Notice how DFS explores depth-first (follows one path deeply before backtracking)
 
 #### UCS, Greedy, and A*
 - In UCS (`algorithm='ucs'`): Observe how nodes are prioritized by path cost
 - In Greedy (`algorithm='greedy'`): See how the heuristic alone determines priority
 - In A* (`algorithm='astar'`): Watch the combination of path cost and heuristic at work
-
-![Algorithm Comparison](screenshots/algorithm_comparison.png)
 
 ### Debugging Tips
 
@@ -204,19 +172,14 @@ By setting breakpoints and watching the execution, you can understand the key di
 - Use "Step Over" to execute a line without diving into function details
 - Use "Continue" to run until the next breakpoint
 - Add "Watch" expressions to monitor complex expressions or data structures
-- Use conditional breakpoints for specific scenarios (right-click on a breakpoint)
 - Use the Debug Console to evaluate expressions during a debugging session
 
-The `screenshots` folder contains reference images for these debugging steps. You can replace them with your own screenshots as you debug the code.
+## Author
+
+[Alexander Karpekov](https://alexkarpekov.com) is the author of this repository. He is a PhD student at Georgia Tech and created this repository to support his teaching of search algorithms in the CS3600 course.
+
+*Parts of this repository were co-developed with the assistance of AI tools, including Claude 3.7 Sonnet and Cursor. All content was reviewed and edited by the author.*
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Author
-
-Alexander Karpekov
-PhD Student at Georgia Tech
-[Personal Website](https://alexkarpekov.com)
-
-*This repository was co-created with assistance from Claude 3.7 Sonnet.*
