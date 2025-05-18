@@ -10,9 +10,9 @@ This repository includes implementations of three classic search problems:
 
 1. **Graph Search**: A general implementation of search algorithms on weighted graphs, including the Romania road map example from the AIMA textbook.
 
-2. **N-Puzzle**: The classic sliding tile puzzle (8-puzzle, 15-puzzle, etc.) where you need to rearrange numbered tiles to reach a goal configuration.
+2. **Word Ladder**: A word game where you transform one word into another by changing one letter at a time, with each intermediate step being a valid word (e.g., "cat" → "cot" → "dot" → "dog").
 
-3. **Word Ladder**: A word game where you transform one word into another by changing one letter at a time, with each intermediate step being a valid word (e.g., "cat" → "cot" → "dot" → "dog").
+3. **N-Puzzle**: The classic sliding tile puzzle (8-puzzle, 15-puzzle, etc.) where you need to rearrange numbered tiles to reach a goal configuration.
 
 ### Implemented Algorithms
 
@@ -31,19 +31,19 @@ The repository includes both uninformed and informed search strategies:
 
 For informed search algorithms, several heuristics are implemented:
 
-- **For N-Puzzle**:
+- **For Graph Search**:
+  - Euclidean distance
   - Manhattan distance
-  - Misplaced tiles
-  - Linear conflict
 
 - **For Word Ladder**:
   - Hamming distance (number of differing letters)
   - Letter set difference
   - Vowel-consonant difference (intentionally poor heuristic for comparison)
 
-- **For Graph Search**:
-  - Euclidean distance
+- **For N-Puzzle**:
   - Manhattan distance
+  - Misplaced tiles
+  - Linear conflict
 
 ## How to Use This Repository
 
@@ -59,7 +59,7 @@ To run the code locally:
 
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/karpekov/cs3600-search.git
    ```
 
 2. Set up the environment:
