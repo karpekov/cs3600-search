@@ -5,6 +5,8 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import deque
+import ipywidgets as widgets
+from IPython.display import display, clear_output
 
 class NPuzzle:
     """
@@ -449,11 +451,6 @@ def create_n_puzzle_demo(
         size=3,
         difficulty=5,
 ):
-    import ipywidgets as widgets
-    from IPython.display import display, clear_output
-    import matplotlib.pyplot as plt
-    import time
-
     demo_puzzle = create_specific_puzzle(size=3, difficulty=5)
 
     # Function to run a search on an N-puzzle and collect step information
@@ -481,7 +478,7 @@ def create_n_puzzle_demo(
     difficulty_slider = widgets.IntSlider(
         value=5,
         min=1,
-        max=20,
+        max=200,
         step=1,
         description='Difficulty:',
         style={'description_width': 'initial'}

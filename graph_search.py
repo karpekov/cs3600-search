@@ -3,6 +3,9 @@ import heapq
 from collections import deque
 import networkx as nx
 import matplotlib.pyplot as plt
+import random
+import ipywidgets as widgets
+from IPython.display import display, clear_output
 
 def create_demo_graph():
     """
@@ -75,97 +78,27 @@ def create_romania_map():
 
     # Add positions for visualization (approximate geographical positions)
     pos = {
-        'Arad': (1, 3), 'Zerind': (1, 4), 'Oradea': (1, 5),
-        'Timisoara': (1, 1), 'Lugoj': (2, 1), 'Mehadia': (3, 1),
-        'Drobeta': (3, 0), 'Craiova': (4, 0),
-        'Sibiu': (3, 3), 'Fagaras': (4, 3),
-        'Rimnicu Vilcea': (4, 2), 'Pitesti': (5, 2),
-        'Bucharest': (6, 1), 'Giurgiu': (6, 0),
-        'Urziceni': (7, 1), 'Hirsova': (8, 1), 'Eforie': (9, 0),
-        'Vaslui': (8, 2), 'Iasi': (8, 3), 'Neamt': (7, 4)
+        'Arad': (1, 4),
+        'Zerind': (1, 5),
+        'Oradea': (1, 6),
+        'Timisoara': (1, 2),
+        'Lugoj': (2, 2),
+        'Mehadia': (2, 1),
+        'Drobeta': (2, 0),
+        'Craiova': (4, 0),
+        'Sibiu': (3, 4),
+        'Fagaras': (5, 4),
+        'Rimnicu Vilcea': (4, 3),
+        'Pitesti': (5, 2),
+        'Bucharest': (6, 1),
+        'Giurgiu': (6, 0),
+        'Urziceni': (7, 2),
+        'Hirsova': (9, 2),
+        'Eforie': (9, 0),
+        'Vaslui': (8, 3),
+        'Iasi': (8, 4),
+        'Neamt': (7, 5)
     }
-
-    nx.set_node_attributes(G, pos, 'pos')
-    return G
-
-def create_large_demo_graph():
-    """
-    Create a larger version of the demo graph with more nodes and edges.
-    Returns a NetworkX graph object.
-    """
-    G = nx.Graph()
-
-    # Add nodes (26 nodes, A-Z)
-    nodes = [chr(65 + i) for i in range(26)]  # A-Z
-    G.add_nodes_from(nodes)
-
-    # Add edges with weights
-    edges = [
-        # First layer
-        ('A', 'B', 4), ('A', 'C', 3), ('A', 'D', 5),
-
-        # Second layer
-        ('B', 'E', 12), ('B', 'F', 5), ('B', 'G', 7),
-        ('C', 'H', 7), ('C', 'I', 10), ('C', 'J', 8),
-        ('D', 'K', 2), ('D', 'L', 4), ('D', 'M', 6),
-
-        # Third layer
-        ('E', 'N', 5), ('F', 'N', 8), ('F', 'O', 6),
-        ('G', 'O', 8), ('G', 'P', 7), ('H', 'P', 9),
-        ('H', 'Q', 6), ('I', 'Q', 5), ('I', 'R', 7),
-        ('J', 'R', 10), ('J', 'S', 7), ('K', 'S', 9),
-        ('K', 'T', 4), ('L', 'T', 6), ('L', 'U', 7),
-        ('M', 'U', 5),
-
-        # Fourth layer - connecting to destination nodes
-        ('N', 'V', 10), ('O', 'V', 7), ('O', 'W', 9),
-        ('P', 'W', 3), ('P', 'X', 6), ('Q', 'X', 8),
-        ('Q', 'Y', 5), ('R', 'Y', 4), ('S', 'Z', 6),
-        ('T', 'Z', 8), ('U', 'Z', 7),
-
-        # Additional connections for more complexity
-        ('V', 'W', 5), ('W', 'X', 4), ('X', 'Y', 3), ('Y', 'Z', 6),
-        ('N', 'O', 6), ('P', 'Q', 7), ('R', 'S', 5), ('T', 'U', 4),
-        ('E', 'F', 8), ('G', 'H', 9), ('I', 'J', 7), ('K', 'L', 6)
-    ]
-
-    G.add_weighted_edges_from(edges)
-
-    # Create a grid-like layout for visualization
-    pos = {}
-    # First layer (A-D)
-    pos['A'] = (0, 0)
-    pos['B'] = (-5, -3)
-    pos['C'] = (0, -3)
-    pos['D'] = (5, -3)
-
-    # Second layer (E-M)
-    pos['E'] = (-8, -6)
-    pos['F'] = (-5, -6)
-    pos['G'] = (-2, -6)
-    pos['H'] = (-1, -6)
-    pos['I'] = (0, -6)
-    pos['J'] = (1, -6)
-    pos['K'] = (2, -6)
-    pos['L'] = (5, -6)
-    pos['M'] = (8, -6)
-
-    # Third layer (N-U)
-    pos['N'] = (-7, -9)
-    pos['O'] = (-5, -9)
-    pos['P'] = (-3, -9)
-    pos['Q'] = (-1, -9)
-    pos['R'] = (1, -9)
-    pos['S'] = (3, -9)
-    pos['T'] = (5, -9)
-    pos['U'] = (7, -9)
-
-    # Fourth layer (V-Z)
-    pos['V'] = (-6, -12)
-    pos['W'] = (-3, -12)
-    pos['X'] = (0, -12)
-    pos['Y'] = (3, -12)
-    pos['Z'] = (6, -12)
 
     nx.set_node_attributes(G, pos, 'pos')
     return G
@@ -181,32 +114,32 @@ def visualize_graph(G, title="Graph", highlighted_path=None, highlighted_nodes=N
         highlighted_nodes: List of nodes to highlight (visited)
         frontier: List of nodes in the frontier
     """
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(8, 5))
     pos = nx.get_node_attributes(G, 'pos')
 
     # Draw the basic graph
-    nx.draw_networkx_nodes(G, pos, node_size=700, node_color='lightblue')
-    nx.draw_networkx_labels(G, pos, font_size=15, font_weight='bold')
+    nx.draw_networkx_nodes(G, pos, node_size=500, node_color='lightblue')
+    nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold')
 
     # Draw edges with weights
     edge_labels = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=12)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10)
     nx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
 
     # Highlight visited nodes if provided
     if highlighted_nodes:
-        nx.draw_networkx_nodes(G, pos, nodelist=highlighted_nodes, node_color='yellow', node_size=700)
+        nx.draw_networkx_nodes(G, pos, nodelist=highlighted_nodes, node_color='yellow', node_size=500)
 
     # Highlight frontier nodes if provided
     if frontier:
-        nx.draw_networkx_nodes(G, pos, nodelist=frontier, node_color='orange', node_size=700)
+        nx.draw_networkx_nodes(G, pos, nodelist=frontier, node_color='orange', node_size=500)
 
     # Highlight path if provided
     if highlighted_path:
         path_edges = [(highlighted_path[i], highlighted_path[i+1]) for i in range(len(highlighted_path)-1)]
         nx.draw_networkx_edges(G, pos, edgelist=path_edges, width=3, edge_color='red')
 
-    plt.title(title, fontsize=16)
+    plt.title(title, fontsize=14)
     plt.axis('off')
     plt.tight_layout()
     return plt.gcf()
@@ -383,7 +316,7 @@ def run_search_comparison(G, start, goal, algorithms, heuristics=None):
 
     return results
 
-def run_graph_search_example(graph, algo, start, goal, heuristic=None):
+def run_graph_search_example(graph, algo, start, goal, heuristic="None"):
     """
     Run a specific search algorithm on a graph and display the results.
 
@@ -392,7 +325,7 @@ def run_graph_search_example(graph, algo, start, goal, heuristic=None):
         algo: Search algorithm to use ('bfs', 'dfs', 'ucs', 'greedy', 'astar')
         start: Starting node
         goal: Goal node
-        heuristic: Heuristic function for informed search (optional)
+        heuristic: Heuristic type as string ('None', 'euclidean', 'manhattan')
 
     Returns:
         path: List of nodes in the solution path
@@ -403,16 +336,23 @@ def run_graph_search_example(graph, algo, start, goal, heuristic=None):
 
     print(f"\nRunning {algo.upper()} search from {start} to {goal}...")
 
+    # Convert heuristic string to function
+    heuristic_function = None
+    if heuristic.lower() == "euclidean":
+        heuristic_function = lambda node1, node2: euclidean_distance_heuristic(node1, node2, graph)
+    elif heuristic.lower() == "manhattan":
+        heuristic_function = lambda node1, node2: manhattan_distance_heuristic(node1, node2, graph)
+
     # For greedy and A*, ensure we have a heuristic
-    if algo.lower() in ['greedy', 'astar'] and heuristic is None:
+    if algo.lower() in ['greedy', 'astar'] and heuristic_function is None:
         print(f"Warning: {algo} requires a heuristic. Using euclidean distance as default.")
-        heuristic = lambda node1, node2: euclidean_distance_heuristic(node1, node2, graph)
+        heuristic_function = lambda node1, node2: euclidean_distance_heuristic(node1, node2, graph)
 
     # Run the search
     path, visited, metrics, states = graph_search(
         graph, start, goal,
         algorithm=algo.lower(),
-        heuristic=heuristic
+        heuristic=heuristic_function
     )
 
     # Display results
@@ -426,7 +366,6 @@ def run_graph_search_example(graph, algo, start, goal, heuristic=None):
     print(f"Max frontier size: {metrics['space']}")
     print(f"Time taken: {metrics['time']:.6f} seconds")
 
-    # Visualize the final state
     fig = visualize_graph(
         graph,
         title=f"{algo.upper()} Search Result",
@@ -447,12 +386,19 @@ def create_graph_search_demo(demo_graph):
 
     # Function to run a search algorithm and collect step-by-step states
     def run_graph_search_demo(algorithm, start_node, goal_node, heuristic_name):
+        # Convert heuristic name to lowercase string for consistency with main function
+        heuristic_str = 'None'
+        if heuristic_name == 'Euclidean':
+            heuristic_str = 'euclidean'
+        elif heuristic_name == 'Manhattan':
+            heuristic_str = 'manhattan'
+
         # Select appropriate heuristic
         heuristic = None
-        if heuristic_name == 'Euclidean':
+        if heuristic_str == 'euclidean':
             def heuristic(node1, node2): return euclidean_distance_heuristic(
                 node1, node2, demo_graph)
-        elif heuristic_name == 'Manhattan':
+        elif heuristic_str == 'manhattan':
             def heuristic(node1, node2): return manhattan_distance_heuristic(
                 node1, node2, demo_graph)
 
@@ -676,4 +622,4 @@ def create_graph_search_demo(demo_graph):
 
 if __name__ == "__main__":
     romania_map = create_romania_map()
-    run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest')
+    run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest', 'euclidean')

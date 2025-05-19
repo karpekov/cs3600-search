@@ -5,7 +5,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import os
 import string
-import numpy as np
 from IPython.display import display, clear_output
 import ipywidgets as widgets
 
@@ -284,7 +283,7 @@ class WordLadderGame:
         # Use a layout algorithm appropriate for larger graphs
         pos = nx.spring_layout(subgraph, seed=42)
 
-        plt.figure(figsize=(12, 10))
+        plt.figure(figsize=(10, 6))
 
         # Draw the basic graph
         nx.draw_networkx_nodes(subgraph, pos, node_size=500, node_color='lightblue')
