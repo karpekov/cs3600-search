@@ -51,7 +51,8 @@ There are three ways to use this code:
 
 ### 1. Using Google Colab (Recommended for Quick Start)
 
-A Google Colab notebook will be provided (link to be added) that allows you to run the code without any local setup.
+The easiest way to use this code is to use this [Google Colab](https://colab.research.google.com/drive/1D_T4jbBuHpuIavGqY6hK7SZBUou8PuL3?usp=sharing) that replicates the functionality in `search_strategies.ipynb` notebook. The Colab notebook is a good way to get started with the code and explore the algorithms.
+
 
 ### 2. Local Setup
 
@@ -97,7 +98,6 @@ For a deeper understanding of the algorithms, you can debug the code using an ID
 - `graph_search.py`: Implementation of graph search algorithms
 - `n_puzzle.py`: Implementation of the n-puzzle problem
 - `word_ladder.py`: Implementation of the Word Ladder game
-- `metrics.py`: Functions for measuring and visualizing algorithm performance
 
 ## Debugging the Algorithms
 

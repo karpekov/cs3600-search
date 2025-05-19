@@ -283,38 +283,6 @@ def manhattan_distance_heuristic(node1, node2, G):
     x2, y2 = pos[node2]
     return abs(x1 - x2) + abs(y1 - y2)
 
-# Function to run multiple search algorithms and collect metrics
-def run_search_comparison(G, start, goal, algorithms, heuristics=None):
-    """
-    Run multiple search algorithms on the same graph and collect metrics.
-
-    Args:
-        G: NetworkX graph
-        start: Starting node
-        goal: Goal node
-        algorithms: List of algorithm names
-        heuristics: Dictionary mapping algorithm names to heuristic functions
-
-    Returns:
-        results: Dictionary with search results and metrics
-    """
-    results = {}
-
-    for algorithm in algorithms:
-        heuristic = None
-        if algorithm in ['greedy', 'astar'] and heuristics:
-            heuristic = heuristics.get(algorithm)
-
-        path, visited, metrics, states = graph_search(G, start, goal, algorithm, heuristic)
-
-        results[algorithm] = {
-            'path': path,
-            'visited': visited,
-            'metrics': metrics,
-            'states': states
-        }
-
-    return results
 
 def run_graph_search_example(graph, algo, start, goal, heuristic="None"):
     """

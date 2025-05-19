@@ -413,39 +413,6 @@ def create_specific_puzzle(size, difficulty):
 
     return NPuzzle(size=size, state=state)
 
-def run_search_comparison_puzzle(puzzle, algorithms, heuristics=None, max_iterations=10000):
-    """
-    Run multiple search algorithms on the same puzzle and collect metrics.
-
-    Args:
-        puzzle: NPuzzle instance
-        algorithms: List of algorithm names
-        heuristics: Dictionary mapping algorithm names to heuristic names
-        max_iterations: Maximum iterations for each search
-
-    Returns:
-        results: Dictionary with search results and metrics
-    """
-    results = {}
-
-    for algorithm in algorithms:
-        heuristic_name = None
-        if algorithm in ['greedy', 'astar'] and heuristics:
-            heuristic_name = heuristics.get(algorithm)
-
-        path, actions, metrics, states = n_puzzle_search(
-            puzzle, algorithm, heuristic_name, max_iterations
-        )
-
-        results[algorithm] = {
-            'path': path,
-            'actions': actions,
-            'metrics': metrics,
-            'states': states
-        }
-
-    return results
-
 
 def create_n_puzzle_demo(
         size=3,
