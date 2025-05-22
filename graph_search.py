@@ -114,7 +114,7 @@ def visualize_graph(G, title="Graph", highlighted_path=None, highlighted_nodes=N
         highlighted_nodes: List of nodes to highlight (visited)
         frontier: List of nodes in the frontier
     """
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(6, 6))  # Make figure square
     pos = nx.get_node_attributes(G, 'pos')
 
     # Draw the basic graph
@@ -139,8 +139,15 @@ def visualize_graph(G, title="Graph", highlighted_path=None, highlighted_nodes=N
         path_edges = [(highlighted_path[i], highlighted_path[i+1]) for i in range(len(highlighted_path)-1)]
         nx.draw_networkx_edges(G, pos, edgelist=path_edges, width=3, edge_color='red')
 
+    # Add coordinate grid
+    plt.grid(True, linestyle='--', alpha=0.3)
+    plt.xticks(range(int(min(x for x, _ in pos.values())) - 1, int(max(x for x, _ in pos.values())) + 2))
+    plt.yticks(range(int(min(y for _, y in pos.values())) - 1, int(max(y for _, y in pos.values())) + 2))
+
+    # Set aspect ratio to be equal for square cells
+    plt.gca().set_aspect('equal')
+
     plt.title(title, fontsize=14)
-    plt.axis('off')
     plt.tight_layout()
     return plt.gcf()
 
@@ -589,5 +596,11 @@ def create_graph_search_demo(demo_graph):
 
 
 if __name__ == "__main__":
-    romania_map = create_romania_map()
-    run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest', 'euclidean')
+    # romania_map = create_romania_map()
+    # run_graph_search_example(romania_map, 'bfs', 'Arad', 'Bucharest')
+    # run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest', 'euclidean')
+
+    demo_graph = create_demo_graph()
+    run_graph_search_example(demo_graph, 'astar', 'A', 'M', 'manhattan')
+
+    print("done")
