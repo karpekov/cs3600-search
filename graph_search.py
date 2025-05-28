@@ -596,9 +596,9 @@ def create_graph_search_demo(demo_graph):
 
 
 if __name__ == "__main__":
-    # romania_map = create_romania_map()
+    romania_map = create_romania_map()
     # run_graph_search_example(romania_map, 'bfs', 'Arad', 'Bucharest')
-    # run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest', 'euclidean')
+    run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest', 'euclidean')
 
     demo_graph = create_demo_graph()
     run_graph_search_example(demo_graph, 'astar', 'A', 'M', 'manhattan')
