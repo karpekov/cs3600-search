@@ -2,6 +2,10 @@
 
 This repository provides an interactive playground for exploring search algorithms as part of the CS3600 (Introduction to Artificial Intelligence) course at Georgia Tech. It contains implementations of various search strategies applied to classic AI problems.
 
+Below is a demo of the interactive search visualization showing A Star and Greedy Best-First Search on the Romania map:
+
+![alt text](assets/search_viz_1080p.gif)
+
 ## Overview
 
 ### Problems and Games
@@ -116,7 +120,7 @@ Read more about setting up a debug environment in VSCode [here](https://code.vis
 
 ### Debugging graph_search.py
 
-![Setting Breakpoints](screenshots/graph_search_breakpoint.jpg)
+![Setting Breakpoints](assets/graph_search_breakpoint.jpg)
 
 1. Open `graph_search.py` in your editor
 2. Scroll to the end of the file where the `if __name__ == "__main__":` section is
