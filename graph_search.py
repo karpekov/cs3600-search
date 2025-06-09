@@ -218,17 +218,17 @@ def graph_search(G, start, goal, algorithm='bfs', heuristic=None):
         elif algorithm in ['ucs', 'greedy', 'astar']:
             frontier_nodes = [node for _, node, _, _ in frontier]
 
-        states['steps'].append({
-            'current': current,
-            'path': path.copy(),
-            'visited': list(visited),
-            'frontier': frontier_nodes.copy(),
-            'cost': cost
-        })
-
         if current not in visited:
             visited.add(current)
             visited_order.append(current)
+
+            states['steps'].append({
+                'current': current,
+                'path': path.copy(),
+                'visited': list(visited),
+                'frontier': frontier_nodes.copy(),
+                'cost': cost
+            })
 
             if current == goal:
                 end_time = time.time()
@@ -594,13 +594,11 @@ def create_graph_search_demo(demo_graph):
         graph_output  # Contains both graph and metadata now
     ]))
 
-
 if __name__ == "__main__":
+
     romania_map = create_romania_map()
-    # run_graph_search_example(romania_map, 'bfs', 'Arad', 'Bucharest')
+    run_graph_search_example(romania_map, 'bfs', 'Arad', 'Bucharest')
     run_graph_search_example(romania_map, 'astar', 'Arad', 'Bucharest', 'euclidean')
 
-    demo_graph = create_demo_graph()
-    run_graph_search_example(demo_graph, 'astar', 'A', 'M', 'manhattan')
-
-    print("done")
+    # demo_graph = create_demo_graph()
+    # run_graph_search_example(demo_graph, 'astar', 'A', 'M', 'manhattan')
